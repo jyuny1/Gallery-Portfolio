@@ -1,22 +1,14 @@
-/* Gallery styles */
+/* Gallery styles - Masonry Layout */
 .gallery {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.8em; /* Increase gap to prevent overlap */
+  display: block; /* Masonry layout */
+  position: relative;
   width: 80%;
   max-width: 1200px;
   margin: 150px auto 20px; /* Adjust for header and tag filter */
   padding: 10px;
   flex-grow: 1; /* Ensure gallery takes up available space */
-  align-items: flex-start; /* Align items to the top */
   opacity: 0; /* Start hidden */
   transition: opacity 1s; /* Fade-in effect */
-}
-
-/* Masonry gallery styles (experimental) */
-.gallery.masonry-enabled {
-  display: block; /* Override flex for masonry */
-  position: relative;
 }
 
 /* Masonry grid sizer for responsive columns */
@@ -24,38 +16,33 @@
   width: 25%; /* Default 4 columns */
 }
 
-/* Masonry item styles */
-.gallery.masonry-enabled img {
-  width: 25%; /* Default 4 columns, matches grid-sizer */
-  margin-bottom: 0.8em;
-  position: absolute; /* Required for masonry positioning */
-}
+/* Masonry layout responsive rules will be applied to the main .gallery img rule below */
 
 /* Responsive masonry layout */
 @media (max-width: 1500px) {
   .grid-sizer,
-  .gallery.masonry-enabled img {
+  .gallery img {
     width: 20%; /* 5 columns */
   }
 }
 
 @media (max-width: 1200px) {
   .grid-sizer,
-  .gallery.masonry-enabled img {
+  .gallery img {
     width: 25%; /* 4 columns */
   }
 }
 
 @media (max-width: 900px) {
   .grid-sizer,
-  .gallery.masonry-enabled img {
+  .gallery img {
     width: 33.333%; /* 3 columns */
   }
 }
 
 @media (max-width: 600px) {
   .grid-sizer,
-  .gallery.masonry-enabled img {
+  .gallery img {
     width: 50%; /* 2 columns */
   }
 }
@@ -155,13 +142,7 @@ body.dark .exif-info strong {
   color: #81C784;
 }
 
-.gallery .column {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 0.8em;
-  position: relative; /* 确保子元素的z-index正常工作 */
-}
+/* Column styles removed - using Masonry layout now */
 
 /* Modal styles */
 .modal {
@@ -301,16 +282,20 @@ body.dark .tag:hover {
     background: #388E3C; /* 深色模式下的绿色 */
 }
 
-/* 基础图片样式 */
+/* Masonry 圖片樣式 - 合併基礎樣式和佈局 */
 .gallery img {
-  width: 100%;
+  /* Masonry layout properties */
+  width: 25%; /* Default 4 columns, matches grid-sizer */
+  margin-bottom: 0.8em;
+  position: absolute; /* Required for masonry positioning */
+
+  /* Visual styling */
   object-fit: cover;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   opacity: 0;
   transform: translateY(30px); /* 修改为与flyIn动画一致的值 */
-  position: relative;
   z-index: 1;
 }
 

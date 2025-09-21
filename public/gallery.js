@@ -42,19 +42,9 @@ class Gallery {
     initComponents() {
         const galleryElement = document.getElementById('gallery');
 
-        // 實驗性功能：使用 URL 參數選擇佈局系統
-        const urlParams = new URLSearchParams(window.location.search);
-        const useMasonry = urlParams.has('masonry');
-
-        if (useMasonry) {
-            console.log('🧪 使用實驗性 Masonry 佈局');
-            // 初始化 Masonry 图片加载器
-            this.imageLoader = new MasonryImageLoader(galleryElement, this.dataLoader);
-        } else {
-            console.log('📦 使用傳統 Column 佈局');
-            // 初始化图片加载器
-            this.imageLoader = new ImageLoader(galleryElement, this.dataLoader);
-        }
+        // 使用 Masonry 作為主要佈局系統
+        console.log('🎯 使用 Masonry 佈局系統');
+        this.imageLoader = new ImageLoader(galleryElement, this.dataLoader);
 
         // 初始化标签筛选器
         this.tagFilter = new TagFilter((tag) => {
