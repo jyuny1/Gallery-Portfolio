@@ -4,6 +4,14 @@
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
 
+# HTML pages - short cache with revalidation
+/*.html
+  Cache-Control: public, max-age=300, must-revalidate
+
+# Root index page
+/
+  Cache-Control: public, max-age=300, must-revalidate
+
 /*.json
   Cache-Control: public, max-age=3600
 
