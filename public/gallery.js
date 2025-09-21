@@ -121,9 +121,20 @@ class Gallery {
             this.imageLoader.filterImages('all');
         }
 
+        // Hide loading spinner after initial setup
         setTimeout(() => {
+            this.hideLoading();
             this.imageLoader.checkIfMoreImagesNeeded();
         }, 500);
+    }
+
+    // Hide the loading spinner
+    hideLoading() {
+        const loadingElement = document.getElementById('loading');
+        if (loadingElement) {
+            loadingElement.classList.add('hidden');
+            console.log('Loading spinner hidden');
+        }
     }
 }
 
