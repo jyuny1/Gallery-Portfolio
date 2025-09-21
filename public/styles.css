@@ -424,6 +424,34 @@ body {
     color: white !important;
 }
 
+/* Zoom Plugin 深色主題樣式 */
+.lg-dark-mode .lg-zoom-in,
+.lg-dark-mode .lg-zoom-out,
+.lg-dark-mode .lg-actual-size {
+    color: white !important;
+    background: rgba(0, 0, 0, 0.8) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.lg-dark-mode .lg-zoom-in:hover,
+.lg-dark-mode .lg-zoom-out:hover,
+.lg-dark-mode .lg-actual-size:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 縮放游標樣式 */
+.lg-dark-mode .lg-image {
+    cursor: zoom-in;
+}
+
+.lg-dark-mode .lg-image.lg-zoomed {
+    cursor: grab;
+}
+
+.lg-dark-mode .lg-image.lg-zoomed:active {
+    cursor: grabbing;
+}
+
 /* 加载指示器样式 */
 #temp-loading-msg {
     text-align: center;

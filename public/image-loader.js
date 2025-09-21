@@ -36,7 +36,7 @@ class ImageLoader {
         }
 
         this.lightGallery = lightGallery(this.galleryElement, {
-            plugins: [],
+            plugins: [lgZoom],
             selector: 'img',
             speed: 400,
             hideBarsDelay: 2000,
@@ -49,6 +49,16 @@ class ImageLoader {
             elementClassNames: {
                 slide: 'lg-slide',
                 outer: 'lg-outer lg-dark-mode'
+            },
+            // Zoom plugin settings
+            zoom: true,
+            scale: 1,
+            enableZoomAfter: 300,
+            actualSize: true,
+            showZoomInOutIcons: true,
+            actualSizeIcons: {
+                zoomIn: 'lg-zoom-in',
+                zoomOut: 'lg-zoom-out'
             }
         });
     }
