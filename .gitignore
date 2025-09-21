@@ -3,7 +3,23 @@ node_modules
 draft.md
 package-lock.json
 
+# Browser tools and testing
+.playwright-mcp/
+*.png
+*.jpg
+*.jpeg
+screenshots/
+
 # Cloudflare Workers
 .wrangler
 dist/
 worker/
+
+# IDE and system files
+.vscode/
+.DS_Store
+Thumbs.db
+
+# Temporary files
+temp/
+tmp/
