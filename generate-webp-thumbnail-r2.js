@@ -31,21 +31,36 @@ const s3 = new S3Client({
 const IMAGE_EXTENSIONS = [".jpg", ".jpeg", ".png", ".gif", ".bmp", ".webp"]; // 输入可能包含 webp
 
 function toPreviewKey(srcKey) {
-  // srcKey: gallery/Category/Filename.EXT
-  const rel = IMAGE_DIR ? srcKey.replace(new RegExp(`^${IMAGE_DIR}/`), "") : srcKey;
+  // srcKey: gallery/Category/Filename.EXT or gallery/Filename.EXT
+  let rel = srcKey;
+  if (IMAGE_DIR) {
+    const prefix = IMAGE_DIR.endsWith('/') ? IMAGE_DIR : IMAGE_DIR + '/';
+    if (srcKey.startsWith(prefix)) {
+      rel = srcKey.substring(prefix.length);
+    }
+  }
+
   const parts = rel.split("/");
-  if (parts.length < 2) return null;
-  const category = parts[0];
-  if (category === "0_preview") return null;
   const filename = parts[parts.length - 1];
   const baseName = filename.replace(/\.[^.]+$/, "");
   const prefix = IMAGE_DIR ? `${IMAGE_DIR}/` : "";
-  return `${prefix}0_preview/${category}/${baseName}.webp`;
+
+  if (parts.length < 2) {
+    // 直接文件，无子目录
+    return `${prefix}0_preview/${baseName}.webp`;
+  } else {
+    // 有子目录的文件
+    const category = parts[0];
+    if (category === "0_preview") return null;
+    return `${prefix}0_preview/${category}/${baseName}.webp`;
+  }
 }
 
 async function ensurePreviewExists(srcKey) {
   const previewKey = toPreviewKey(srcKey);
   if (!previewKey) return;
+
+  console.log(`检查预览: ${previewKey}`);
 
   try {
     await s3.send(new HeadObjectCommand({ Bucket: BUCKET, Key: previewKey }));
@@ -53,29 +68,46 @@ async function ensurePreviewExists(srcKey) {
     return;
   } catch (err) {
     if (err?.$metadata?.httpStatusCode && err.$metadata.httpStatusCode !== 404) {
+      console.error(`检查预览失败: ${previewKey}`, err.message);
       throw err;
     }
+    console.log(`预览不存在，开始生成: ${previewKey}`);
   }
 
-  // 下载原图 -> 生成 webp -> 上传
-  const obj = await s3.send(new GetObjectCommand({ Bucket: BUCKET, Key: srcKey }));
-  const fileBuffer = await streamToBuffer(obj.Body);
+  try {
+    // 下载原图
+    console.log(`下载原图: ${srcKey}`);
+    const obj = await s3.send(new GetObjectCommand({ Bucket: BUCKET, Key: srcKey }));
+    const fileBuffer = await streamToBuffer(obj.Body);
+    console.log(`原图下载完成，大小: ${fileBuffer.length} bytes`);
 
-  const previewBuffer = await sharp(fileBuffer)
-    .rotate()
-    .webp({ quality: QUALITY })
-    .toBuffer();
+    // 生成 webp
+    console.log(`生成 WebP 预览，质量: ${QUALITY}`);
+    const previewBuffer = await sharp(fileBuffer)
+      .rotate()
+      .webp({ quality: QUALITY })
+      .toBuffer();
+    console.log(`WebP 生成完成，大小: ${previewBuffer.length} bytes`);
 
-  await s3.send(
-    new PutObjectCommand({
-      Bucket: BUCKET,
-      Key: previewKey,
-      Body: previewBuffer,
-      ContentType: "image/webp",
-    })
-  );
+    // 上传预览图
+    console.log(`上传预览图: ${previewKey}`);
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: BUCKET,
+        Key: previewKey,
+        Body: previewBuffer,
+        ContentType: "image/webp",
+      })
+    );
 
-  console.log(`预览生成完成: ${previewKey}`);
+    console.log(`预览生成完成: ${previewKey}`);
+  } catch (err) {
+    console.error(`生成预览失败: ${srcKey} -> ${previewKey}`);
+    console.error(`错误详情:`, err.message);
+    console.error(`错误代码:`, err.Code);
+    console.error(`HTTP状态:`, err?.$metadata?.httpStatusCode);
+    throw err;
+  }
 }
 
 async function listAllObjects(prefix) {

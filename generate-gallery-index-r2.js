@@ -38,13 +38,23 @@ const s3 = new S3Client({
 });
 
 // 构建图片URL（从 .env 读取自定义域名/路径）
-function buildImageUrls(categoryName, fileName, fileExt) {
+function buildImageUrls(categoryName, fileName, fileExt, isDirectFile = false) {
   const baseUrl = (process.env.R2_IMAGE_BASE_URL || "").replace(/\/+$/, ""); // 去除末尾斜杠
   const dir = (process.env.R2_IMAGE_DIR || "").replace(/^\/+|\/+$/g, ""); // 去除首尾斜杠
 
   const pathBase = dir ? `${baseUrl}/${dir}` : baseUrl;
-  const originalUrl = `${pathBase}/${categoryName}/${fileName}.${fileExt}`;
-  const previewUrl = `${pathBase}/0_preview/${categoryName}/${fileName}.webp`;
+
+  let originalUrl, previewUrl;
+  if (isDirectFile) {
+    // 直接在根目录下的文件
+    originalUrl = `${pathBase}/${fileName}.${fileExt}`;
+    previewUrl = `${pathBase}/0_preview/${fileName}.webp`;
+  } else {
+    // 有子目录的文件
+    originalUrl = `${pathBase}/${categoryName}/${fileName}.${fileExt}`;
+    previewUrl = `${pathBase}/0_preview/${categoryName}/${fileName}.webp`;
+  }
+
   return { originalUrl, previewUrl };
 }
 
@@ -94,24 +104,39 @@ async function generateGalleryIndex() {
     if (!IMAGE_EXTENSIONS.includes(ext)) continue;
 
     // 获取 category 和 文件名
-    const relativePath = key.replace(IMAGE_DIR, "").replace(/^\/+/, "");
+    let relativePath = key;
+    if (IMAGE_DIR) {
+      const prefix = IMAGE_DIR.endsWith('/') ? IMAGE_DIR : IMAGE_DIR + '/';
+      if (key.startsWith(prefix)) {
+        relativePath = key.substring(prefix.length);
+      }
+    }
     const parts = relativePath.split("/");
-    if (parts.length < 2) continue; // 必须至少有 "category/filename"
-    const categoryName = parts[0];
+
+    let categoryName, fileName;
+    if (parts.length < 2) {
+      // 如果只有一个部分，使用默认分类
+      categoryName = "default";
+      fileName = parts[0];
+    } else {
+      categoryName = parts[0];
+      fileName = parts[parts.length - 1];
+    }
     if (categoryName === "0_preview") continue; // 跳过预览目录
 
-    const file = parts[parts.length - 1];
-    const originalExt = path.extname(file);
-    const fileName = path.basename(file, originalExt);
+    const originalExt = path.extname(fileName);
+    const baseName = path.basename(fileName, originalExt);
+    const isDirectFile = parts.length < 2; // 判断是否为直接文件
 
     const { originalUrl, previewUrl } = buildImageUrls(
       categoryName,
-      fileName,
-      originalExt.substring(1)
+      baseName,
+      originalExt.substring(1),
+      isDirectFile
     );
 
     const imageInfo = {
-      name: fileName,
+      name: baseName,
       original: originalUrl,
       preview: previewUrl,
       category: categoryName,

@@ -490,31 +490,7 @@ class ImageLoader {
 
     // 处理所有图片加载完成
     handleAllImagesLoaded() {
-        if (!document.getElementById('all-loaded-message')) {
-            const loadedMsg = document.createElement('div');
-            loadedMsg.id = 'all-loaded-message';
-            loadedMsg.textContent = '————  已全部加载完毕  ————';
-            loadedMsg.style.textAlign = 'center';
-            loadedMsg.style.margin = '20px 0';
-            loadedMsg.style.padding = '10px';
-            loadedMsg.style.color = 'var(--text-color)';
-            loadedMsg.style.backgroundColor = 'rgba(76, 175, 80, 0.1)';
-            loadedMsg.style.borderRadius = '5px';
-            loadedMsg.style.animation = 'fadeIn 1s';
-            document.querySelector('footer').before(loadedMsg);
-            
-            if (!document.getElementById('fadeInStyle')) {
-                const style = document.createElement('style');
-                style.id = 'fadeInStyle';
-                style.textContent = `
-                    @keyframes fadeIn {
-                        from { opacity: 0; }
-                        to { opacity: 1; }
-                    }
-                `;
-                document.head.appendChild(style);
-            }
-        }
+        // 不显示"已全部加载完毕"消息
         
         setTimeout(() => {
             window.scrollBy(0, 1);
@@ -645,7 +621,7 @@ class ImageLoader {
 
     // 筛选图片
     filterImages(tag) {
-        // 移除底部"已全部加载完成"的提示消息
+        // 移除已全部加载完成的提示消息（如果存在）
         const loadedMsg = document.getElementById('all-loaded-message');
         if (loadedMsg) {
             loadedMsg.remove();
