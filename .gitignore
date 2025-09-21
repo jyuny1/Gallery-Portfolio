@@ -10,6 +10,9 @@ package-lock.json
 *.jpeg
 screenshots/
 
+# Gallery update scripts should be tracked
+!update-gallery.*
+
 # Cloudflare Workers
 .wrangler
 dist/
