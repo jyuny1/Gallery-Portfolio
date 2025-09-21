@@ -13,37 +13,37 @@
 
 /* Masonry grid sizer for responsive columns */
 .grid-sizer {
-  width: 25%; /* Default 4 columns */
+  width: 15.96%; /* Default 6 columns for large screens - adjusted for 8px gutter */
 }
 
 /* Masonry layout responsive rules will be applied to the main .gallery img rule below */
 
-/* Responsive masonry layout */
-@media (max-width: 1500px) {
+/* Responsive masonry layout - Progressive enhancement approach */
+@media (max-width: 1499px) {
   .grid-sizer,
   .gallery img {
-    width: 20%; /* 5 columns */
+    width: 19.32%; /* 5 columns (1200px-1499px) - adjusted for 8px gutter */
   }
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1199px) {
   .grid-sizer,
   .gallery img {
-    width: 25%; /* 4 columns */
+    width: 24.36%; /* 4 columns (900px-1199px) - adjusted for 8px gutter */
   }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 899px) {
   .grid-sizer,
   .gallery img {
-    width: 33.333%; /* 3 columns */
+    width: 32.77%; /* 3 columns (600px-899px) - adjusted for 8px gutter */
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 599px) {
   .grid-sizer,
   .gallery img {
-    width: 50%; /* 2 columns */
+    width: 49.57%; /* 2 columns (<600px) - adjusted for 8px gutter */
   }
 }
 
@@ -285,8 +285,8 @@ body.dark .tag:hover {
 /* Masonry 圖片樣式 - 合併基礎樣式和佈局 */
 .gallery img {
   /* Masonry layout properties */
-  width: 25%; /* Default 4 columns, matches grid-sizer */
-  margin-bottom: 0.8em;
+  width: 15.96%; /* Default 6 columns for large screens, matches grid-sizer - adjusted for 8px gutter */
+  margin-bottom: 8px; /* Match Masonry gutter spacing for consistent 8px spacing */
   position: absolute; /* Required for masonry positioning */
 
   /* Visual styling */

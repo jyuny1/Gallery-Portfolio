@@ -25,17 +25,20 @@ class ImageLoader {
     setupMasonry() {
         // Gallery 默認使用 Masonry 佈局
 
-        // 創建 grid-sizer 元素
-        const gridSizer = document.createElement('div');
-        gridSizer.className = 'grid-sizer';
-        this.galleryElement.appendChild(gridSizer);
+        // 檢查是否已存在 grid-sizer，如果沒有才創建
+        let gridSizer = this.galleryElement.querySelector('.grid-sizer');
+        if (!gridSizer) {
+            gridSizer = document.createElement('div');
+            gridSizer.className = 'grid-sizer';
+            this.galleryElement.appendChild(gridSizer);
+        }
 
         // 初始化 Masonry
         this.masonry = new Masonry(this.galleryElement, {
             itemSelector: 'img',
             columnWidth: '.grid-sizer',
             percentPosition: true,
-            gutter: 8 // 0.8em converted to pixels approximately
+            gutter: 8 // Standard spacing for better visual separation
         });
 
         console.log('Masonry 初始化完成');
@@ -325,6 +328,33 @@ class ImageLoader {
 
         totalHeight += 40; // 額外間距
         this.galleryElement.style.marginTop = `${totalHeight}px`;
+    }
+
+    // 簡化的 updateColumns 方法 - 只更新載入數量和 Masonry 佈局
+    updateColumns() {
+        const width = window.innerWidth;
+        let computedImagesPerLoad;
+
+        // 計算每次載入圖片數量（與 CSS 媒體查詢一致）
+        if (width < 600) {          // 2 columns
+            computedImagesPerLoad = 8;
+        } else if (width < 900) {   // 3 columns
+            computedImagesPerLoad = 12;
+        } else if (width < 1200) {  // 4 columns
+            computedImagesPerLoad = 16;
+        } else if (width < 1500) {  // 5 columns
+            computedImagesPerLoad = 20;
+        } else {                    // 6 columns
+            computedImagesPerLoad = 24;
+        }
+
+        this.imagesPerLoad = computedImagesPerLoad;
+        console.log(`更新載入數量: ${computedImagesPerLoad} (視窗寬度: ${width}px)`);
+
+        // 觸發 Masonry 重新佈局
+        if (this.masonry) {
+            this.masonry.layout();
+        }
     }
 }
 
