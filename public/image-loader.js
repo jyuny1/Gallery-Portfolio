@@ -36,7 +36,7 @@ class ImageLoader {
         }
 
         this.lightGallery = lightGallery(this.galleryElement, {
-            plugins: [lgZoom],
+            plugins: [lgZoom, lgHash, lgThumbnail],
             selector: 'img',
             speed: 400,
             hideBarsDelay: 2000,
@@ -50,17 +50,81 @@ class ImageLoader {
                 slide: 'lg-slide',
                 outer: 'lg-outer lg-dark-mode'
             },
+            // Hash plugin settings
+            hash: true,
+            galleryId: 'ljy-gallery',
+            // Thumbnails plugin settings
+            thumbnail: true,
+            animateThumb: true,
+            currentPagerPosition: 0,
+            thumbWidth: 100,
+            thumbHeight: '80px',
+            thumbMargin: 5,
+            toggleThumb: true,
+            enableThumbDrag: true,
+            enableThumbSwipe: true,
             // Zoom plugin settings
             zoom: true,
-            scale: 1,
-            enableZoomAfter: 300,
+            scale: 1.2,
+            enableZoomAfter: 0,
             actualSize: true,
+            zoomFromOrigin: false,
             showZoomInOutIcons: true,
             actualSizeIcons: {
                 zoomIn: 'lg-zoom-in',
                 zoomOut: 'lg-zoom-out'
             }
         });
+
+        // 添加事件監聽器來強制保持圖片比例和修復縮略圖
+        this.galleryElement.addEventListener('lgAfterSlide', (event) => {
+            this.enforceImageAspectRatio();
+            this.fixThumbnailSrc();
+        });
+
+        this.galleryElement.addEventListener('lgAfterOpen', (event) => {
+            this.enforceImageAspectRatio();
+            this.fixThumbnailSrc();
+        });
+    }
+
+    // 強制保持圖片正確比例 - 基於實際DOM結構
+    enforceImageAspectRatio() {
+        setTimeout(() => {
+            const lgImage = document.querySelector('.lg-outer .lg-current picture.lg-img-wrap .lg-object.lg-image');
+            if (lgImage) {
+                // 強制設置正確的樣式，覆蓋lightGallery的內聯樣式
+                lgImage.style.setProperty('width', 'auto', 'important');
+                lgImage.style.setProperty('height', 'auto', 'important');
+                lgImage.style.setProperty('max-width', '90vw', 'important');
+                lgImage.style.setProperty('max-height', '90vh', 'important');
+                lgImage.style.setProperty('object-fit', 'contain', 'important');
+
+                console.log('強制應用圖片比例保持樣式 - DOM結構匹配');
+            } else {
+                console.warn('未找到圖片元素');
+            }
+        }, 100);
+    }
+
+    // 修復縮略圖src屬性
+    fixThumbnailSrc() {
+        setTimeout(() => {
+            const galleryImages = document.querySelectorAll('.gallery img');
+            const thumbnails = document.querySelectorAll('.lg-thumb-item img');
+
+            console.log(`找到 ${galleryImages.length} 個圖片和 ${thumbnails.length} 個縮略圖`);
+
+            // 將原始圖片的data-thumb屬性應用到縮略圖
+            galleryImages.forEach((img, index) => {
+                const thumbSrc = img.getAttribute('data-thumb');
+                if (thumbnails[index] && thumbSrc) {
+                    // 總是設置，不管是否已有src
+                    thumbnails[index].src = thumbSrc;
+                    console.log(`設置縮略圖 ${index}: ${thumbSrc}`);
+                }
+            });
+        }, 200);
     }
 
     // 创建列元素
@@ -376,7 +440,22 @@ class ImageLoader {
                     
                     // 添加到已加载集合
                     this.loadedImageUrls.add(imageUrl);
-                    
+
+                    // 設置 lightGallery 所需的屬性
+                    img.setAttribute('data-src', originalUrl);
+                    img.setAttribute('data-sub-html', `<h4>${imageData.name}</h4>`);
+                    // 設置縮略圖URL（使用預覽圖作為縮略圖）
+                    img.setAttribute('data-thumb', imageUrl);
+
+                    // 獲取原圖尺寸並設置 data-lg-size 屬性
+                    this.getImageDimensions(originalUrl).then(dimensions => {
+                        if (dimensions) {
+                            img.setAttribute('data-lg-size', `${dimensions.width}-${dimensions.height}`);
+                        }
+                    }).catch(error => {
+                        console.warn('無法獲取圖片尺寸:', originalUrl, error);
+                    });
+
                     // 添加到最短列
                     const shortestColumnIndex = this.getShortestColumn();
                     this.columnElements[shortestColumnIndex].appendChild(img);
@@ -435,9 +514,6 @@ class ImageLoader {
             // 添加到加载中列表
             this.loadingImages.push(img);
             
-            // 設置 lightGallery 所需的屬性
-            img.setAttribute('data-src', originalUrl);
-            img.setAttribute('data-sub-html', `<h4>${imageData.name}</h4>`);
         };
         
         // 开始加载第一张图片
@@ -698,6 +774,26 @@ class ImageLoader {
         if (this.lightGallery) {
             this.lightGallery.refresh();
         }
+    }
+
+    // 獲取圖片尺寸
+    async getImageDimensions(imageUrl) {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+
+            img.onload = function() {
+                resolve({
+                    width: this.naturalWidth,
+                    height: this.naturalHeight
+                });
+            };
+
+            img.onerror = function() {
+                reject(new Error('圖片加載失敗'));
+            };
+
+            img.src = imageUrl;
+        });
     }
 }
 

@@ -452,6 +452,40 @@ body {
     cursor: grabbing;
 }
 
+/* 基於實際DOM結構的精確選擇器 */
+.lg-outer .lg-inner .lg-item picture.lg-img-wrap .lg-object.lg-image {
+    object-fit: contain !important;
+    max-width: 90vw !important;
+    max-height: 90vh !important;
+    width: auto !important;
+    height: auto !important;
+}
+
+/* 確保picture容器不會拉伸圖片 */
+.lg-outer .lg-inner .lg-item picture.lg-img-wrap {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+/* 強制lg-item保持正確布局 */
+.lg-outer .lg-inner .lg-item {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+}
+
+/* 最高優先級：覆蓋所有內聯樣式 */
+.lg-outer .lg-inner .lg-item picture.lg-img-wrap .lg-object.lg-image[style] {
+    width: auto !important;
+    height: auto !important;
+    max-width: 90vw !important;
+    max-height: 90vh !important;
+    object-fit: contain !important;
+}
+
 /* 加载指示器样式 */
 #temp-loading-msg {
     text-align: center;
@@ -533,4 +567,43 @@ body.dark .notification {
   background-color: #1e1e1e; /* 改为不透明背景 */
   color: #f0f0f0;
   border: 1px solid rgba(80, 80, 80, 0.5); /* 添加边框 */
+}
+
+/* lightGallery Thumbnails 深色主題樣式 */
+.lg-dark-mode .lg-thumb-outer {
+  background-color: rgba(0, 0, 0, 0.8) !important;
+  border-top: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+.lg-dark-mode .lg-thumb-item {
+  border: 2px solid rgba(255, 255, 255, 0.2) !important;
+  border-radius: 4px !important;
+}
+
+.lg-dark-mode .lg-thumb-item.active,
+.lg-dark-mode .lg-thumb-item:hover {
+  border-color: #4CAF50 !important;
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.5) !important;
+}
+
+.lg-dark-mode .lg-thumb-item img {
+  opacity: 0.7 !important;
+  transition: opacity 0.3s ease !important;
+}
+
+.lg-dark-mode .lg-thumb-item.active img,
+.lg-dark-mode .lg-thumb-item:hover img {
+  opacity: 1 !important;
+}
+
+/* 縮略圖切換按鈕樣式 */
+.lg-dark-mode .lg-toogle-thumb {
+  background: rgba(0, 0, 0, 0.8) !important;
+  color: white !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  border-radius: 4px !important;
+}
+
+.lg-dark-mode .lg-toogle-thumb:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
 }
