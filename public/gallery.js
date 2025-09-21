@@ -55,8 +55,7 @@ class Gallery {
         const categories = this.dataLoader.getCategories();
         this.tagFilter.createTagFilter(categories);
 
-        // 设置模态窗口事件
-        this.imageLoader.setupModalEvents();
+        // lightGallery events are handled automatically
 
         // 设置gallery的margin-top
         this.imageLoader.setGalleryMarginTop();

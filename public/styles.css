@@ -406,6 +406,24 @@ body {
     display: none !important;
 }
 
+/* lightGallery 深色主題自定義 */
+.lg-dark-mode .lg-backdrop {
+    background-color: rgba(0, 0, 0, 0.9) !important;
+}
+
+.lg-dark-mode .lg-toolbar {
+    background: rgba(0, 0, 0, 0.8) !important;
+}
+
+.lg-dark-mode .lg-toolbar .lg-icon {
+    color: white !important;
+}
+
+.lg-dark-mode .lg-sub-html {
+    background: rgba(0, 0, 0, 0.8) !important;
+    color: white !important;
+}
+
 /* 加载指示器样式 */
 #temp-loading-msg {
     text-align: center;

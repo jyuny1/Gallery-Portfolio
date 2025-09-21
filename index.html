@@ -6,6 +6,7 @@
     <title>LJY's Darkroom</title>
     <link rel="stylesheet" href="public/styles.css" />
     <link rel="stylesheet" href="public/gallery.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/css/lightgallery.css" />
     <link rel="icon" href="public/assets/favicon.svg" type="image/svg+xml" />
   </head>
   <body>
@@ -29,13 +30,10 @@
     <div id="loading"></div>
     <div class="gallery" id="gallery"></div>
 
-    <!-- Modal for image display -->
-    <div id="myModal" class="modal">
-      <span class="close">&times;</span>
-      <img class="modal-content" id="img01" />
-      <div id="exif-info"></div>
-      <button id="load-original-btn" class="load-original-btn">加载原图</button>
-    </div>
+    <!-- lightGallery will create its own modal structure -->
+
+    <!-- lightGallery JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/lightgallery@2.7.2/lightgallery.min.js"></script>
 
     <!-- 加载JavaScript模块 -->
     <script src="public/data-loader.js"></script>
