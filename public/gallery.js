@@ -121,9 +121,30 @@ class Gallery {
             this.imageLoader.filterImages('all');
         }
 
+        // 調用 updateColumns 方法
+        this.imageLoader.updateColumns();
+
         setTimeout(() => {
             this.imageLoader.checkIfMoreImagesNeeded();
+            // 隱藏載入圖標
+            this.hideLoading();
         }, 500);
+    }
+
+    // 隱藏載入圖標並顯示畫廊
+    hideLoading() {
+        const loadingElement = document.getElementById('loading');
+        if (loadingElement) {
+            loadingElement.classList.add('hidden');
+            console.log('載入圖標已隱藏');
+        }
+
+        // 顯示畫廊
+        const galleryElement = document.getElementById('gallery');
+        if (galleryElement) {
+            galleryElement.style.opacity = '1';
+            console.log('畫廊已顯示');
+        }
     }
 }
 
