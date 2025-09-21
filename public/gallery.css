@@ -13,6 +13,53 @@
   transition: opacity 1s; /* Fade-in effect */
 }
 
+/* Masonry gallery styles (experimental) */
+.gallery.masonry-enabled {
+  display: block; /* Override flex for masonry */
+  position: relative;
+}
+
+/* Masonry grid sizer for responsive columns */
+.grid-sizer {
+  width: 25%; /* Default 4 columns */
+}
+
+/* Masonry item styles */
+.gallery.masonry-enabled img {
+  width: 25%; /* Default 4 columns, matches grid-sizer */
+  margin-bottom: 0.8em;
+  position: absolute; /* Required for masonry positioning */
+}
+
+/* Responsive masonry layout */
+@media (max-width: 1500px) {
+  .grid-sizer,
+  .gallery.masonry-enabled img {
+    width: 20%; /* 5 columns */
+  }
+}
+
+@media (max-width: 1200px) {
+  .grid-sizer,
+  .gallery.masonry-enabled img {
+    width: 25%; /* 4 columns */
+  }
+}
+
+@media (max-width: 900px) {
+  .grid-sizer,
+  .gallery.masonry-enabled img {
+    width: 33.333%; /* 3 columns */
+  }
+}
+
+@media (max-width: 600px) {
+  .grid-sizer,
+  .gallery.masonry-enabled img {
+    width: 50%; /* 2 columns */
+  }
+}
+
 /* Keyframes for image fly-in effect */
 @keyframes flyIn {
   0% {
