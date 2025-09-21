@@ -128,12 +128,18 @@ class Gallery {
         }, 500);
     }
 
-    // Hide the loading spinner
+    // Hide the loading spinner and show gallery
     hideLoading() {
         const loadingElement = document.getElementById('loading');
+        const galleryElement = document.querySelector('.gallery');
+
         if (loadingElement) {
             loadingElement.classList.add('hidden');
             console.log('Loading spinner hidden');
+        }
+        if (galleryElement) {
+            galleryElement.classList.add('visible');
+            console.log('Gallery set to visible');
         }
     }
 }

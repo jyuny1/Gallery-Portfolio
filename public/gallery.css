@@ -11,6 +11,10 @@
   transition: opacity 1s; /* Fade-in effect */
 }
 
+.gallery.visible {
+  opacity: 1;
+}
+
 /* Masonry grid sizer for responsive columns */
 .grid-sizer {
   width: 25%; /* Default 4 columns */
