@@ -120,7 +120,6 @@ class Gallery {
         if (this.tagFilter.getCurrentTag() === 'all') {
             this.imageLoader.filterImages('all');
         }
-        this.imageLoader.updateColumns();
 
         setTimeout(() => {
             this.imageLoader.checkIfMoreImagesNeeded();
