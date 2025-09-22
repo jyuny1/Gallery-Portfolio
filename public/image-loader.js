@@ -23,24 +23,16 @@ class ImageLoader {
     }
 
     setupMasonry() {
-        // Gallery 默認使用 Masonry 佈局
-
-        // 創建 grid-sizer 元素
-        const gridSizer = document.createElement('div');
-        gridSizer.className = 'grid-sizer';
-        this.galleryElement.appendChild(gridSizer);
-
-        // 初始化 Masonry - 2025 最佳實踐配置
+        // Masonry 100% 自動佈局 - 讓 Masonry 完全控制容器寬度和圖片排列
         this.masonry = new Masonry(this.galleryElement, {
             itemSelector: 'img',
-            columnWidth: '.grid-sizer',
-            percentPosition: true,
+            columnWidth: 200, // 設置列寬與圖片寬度一致
             gutter: 8,
-            fitWidth: true,  // 容器自動適應寬度
+            fitWidth: true,    // 讓 Masonry 自動計算容器寬度
             initLayout: false  // 手動控制初始化時機
         });
 
-        console.log('Masonry 初始化完成');
+        console.log('Masonry 100% 自動佈局初始化完成 - Masonry 控制容器寬度');
     }
 
     initLightGallery() {
@@ -151,12 +143,12 @@ class ImageLoader {
                 clearTimeout(resizeTimeout);
             }
             resizeTimeout = setTimeout(() => {
-                // 只更新性能參數，讓 Masonry 自動處理佈局
-                this.updateImagesPerLoad();
-                // Masonry 會自動響應 CSS 媒體查詢變化
+                // Masonry percentPosition 自動處理響應式，只需觸發重新佈局
                 if (this.masonry) {
                     this.masonry.layout();
+                    console.log('螢幕尺寸改變 - Masonry 自動重新佈局');
                 }
+                this.updateImagesPerLoad();
             }, 250);
         });
     }
@@ -240,8 +232,8 @@ class ImageLoader {
                         img.classList.add('loaded');
                     }, 10);
 
-                    // 更新 Masonry 佈局
-                    this.masonry.appended(img);
+                    // Masonry 100% 自動佈局 - 安全的佈局更新
+                    this.masonry.reloadItems();
                     this.masonry.layout();
 
                     // 刷新 lightGallery
@@ -270,13 +262,13 @@ class ImageLoader {
     }
 
     filterImages(tag) {
-        console.log(`篩選圖片: ${tag} (Masonry版本)`);
+        console.log(`篩選圖片: ${tag} (Masonry 100% 自動佈局)`);
         this.currentTag = tag;
         this.currentIndex = 0;
         this.imagesLoadedCount = 0;
         this.loadedImageUrls.clear();
 
-        // 清除現有圖片，保留 grid-sizer
+        // 清除現有圖片
         const images = this.galleryElement.querySelectorAll('img');
         images.forEach(img => img.remove());
 

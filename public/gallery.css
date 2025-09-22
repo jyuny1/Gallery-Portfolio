@@ -2,9 +2,10 @@
 .gallery {
   display: block; /* Masonry layout */
   position: relative;
-  width: 80%;
-  max-width: 1200px;
-  margin: 150px auto 20px; /* Adjust for header and tag filter */
+  /* Masonry 自動計算容器寬度，但限制最大寬度避免過寬 */
+  width: auto; /* 讓 Masonry fitWidth 自動計算容器寬度 */
+  max-width: 1700px; /* 限制最大寬度，避免容器過寬 */
+  margin: 150px auto 20px; /* 保持上下間距，左右自動居中 */
   padding: 10px;
   flex-grow: 1; /* Ensure gallery takes up available space */
   opacity: 0; /* Start hidden */
@@ -15,41 +16,10 @@
   opacity: 1;
 }
 
-/* Masonry grid sizer for responsive columns */
-.grid-sizer {
-  width: 25%; /* Default 4 columns */
-}
+/* Masonry 100% 自動佈局 - 移除所有手動控制列數的邏輯 */
+/* 讓 Masonry 根據圖片寬度自動計算最佳列數 */
 
-/* Masonry layout responsive rules will be applied to the main .gallery img rule below */
-
-/* Responsive masonry layout */
-@media (max-width: 1500px) {
-  .grid-sizer,
-  .gallery img {
-    width: 20%; /* 5 columns */
-  }
-}
-
-@media (max-width: 1200px) {
-  .grid-sizer,
-  .gallery img {
-    width: 25%; /* 4 columns */
-  }
-}
-
-@media (max-width: 900px) {
-  .grid-sizer,
-  .gallery img {
-    width: 33.333%; /* 3 columns */
-  }
-}
-
-@media (max-width: 600px) {
-  .grid-sizer,
-  .gallery img {
-    width: 50%; /* 2 columns */
-  }
-}
+/* 移除強制列數控制，讓 Masonry 完全自動決定佈局 */
 
 /* Keyframes for image fly-in effect */
 @keyframes flyIn {
@@ -286,17 +256,21 @@ body.dark .tag:hover {
     background: #388E3C; /* 深色模式下的绿色 */
 }
 
-/* Masonry 圖片樣式 - 讓 Masonry 完全控制佈局 */
+/* Masonry 100% 自動佈局 - 讓 Masonry 根據圖片尺寸自動決定列數 */
 .gallery img {
-  /* Visual styling only - layout controlled by Masonry */
-  object-fit: cover;
+  /* 設置固定基準寬度，讓 Masonry 自動計算最佳列數 */
+  width: 200px; /* 基準寬度，Masonry 會根據容器自動調整列數 */
+  height: auto;
+
+  /* 視覺樣式 */
+  object-fit: contain; /* 不裁切圖片，保持完整內容 */
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   cursor: pointer;
   opacity: 0;
   transform: translateY(30px);
   z-index: 1;
-  margin-bottom: 0.8em;
+  margin-bottom: 8px; /* 對應 Masonry gutter */
 }
 
 /* 已加载图片的基本样式 */
