@@ -204,9 +204,21 @@ class ImageLoader {
             }
 
             const imageData = imagesToLoad[index];
-            const img = document.createElement('img');
 
-            img.onload = () => {
+            // 先預加載圖片，不立即添加到 DOM
+            const preloadImg = new Image();
+
+            preloadImg.onload = () => {
+                // 圖片預加載完成後，創建 DOM 元素
+                const img = document.createElement('img');
+
+                // 設置基本屬性
+                img.src = imageData.preview;
+                img.alt = imageData.name || 'Gallery Image';
+                img.dataset.original = imageData.original;
+                img.dataset.preview = imageData.preview;
+                img.dataset.category = imageData.category || 'unknown';
+
                 // 設置 lightGallery 所需的屬性
                 img.setAttribute('data-src', imageData.original);
                 img.setAttribute('data-sub-html', `<h4>${imageData.name}</h4>`);
@@ -221,20 +233,20 @@ class ImageLoader {
                     console.warn('無法獲取圖片尺寸:', imageData.original, error);
                 });
 
-                // 添加圖片到 gallery
+                // 添加圖片到 gallery (此時圖片已預加載完成)
                 this.galleryElement.appendChild(img);
                 this.loadedImageUrls.add(imageData.preview);
 
-                // 使用 imagesLoaded 確保圖片完全載入後再更新 Masonry
+                // 使用 imagesLoaded 確保 DOM 中的圖片完全載入後再更新 Masonry
                 imagesLoaded(img, () => {
-                    // 添加載入動畫
-                    setTimeout(() => {
-                        img.classList.add('loaded');
-                    }, 10);
-
-                    // Masonry 100% 自動佈局 - 安全的佈局更新
+                    // Masonry 佈局更新 - 圖片已在正確尺寸下
                     this.masonry.reloadItems();
                     this.masonry.layout();
+
+                    // 添加載入動畫效果
+                    setTimeout(() => {
+                        img.classList.add('loaded');
+                    }, 50); // 稍微延遲確保 Masonry 佈局完成
 
                     // 刷新 lightGallery
                     this.refreshLightGallery();
@@ -246,16 +258,13 @@ class ImageLoader {
                 });
             };
 
-            img.onerror = () => {
+            preloadImg.onerror = () => {
                 console.error('圖片載入失敗:', imageData.preview);
                 loadSingleImage(index + 1);
             };
 
-            img.src = imageData.preview;
-            img.alt = imageData.name || 'Gallery Image';
-            img.dataset.original = imageData.original;
-            img.dataset.preview = imageData.preview;
-            img.dataset.category = imageData.category || 'unknown';
+            // 開始預加載圖片
+            preloadImg.src = imageData.preview;
         };
 
         loadSingleImage(0);

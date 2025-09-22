@@ -21,14 +21,12 @@
 
 /* 移除強制列數控制，讓 Masonry 完全自動決定佈局 */
 
-/* Keyframes for image fly-in effect */
-@keyframes flyIn {
+/* Keyframes for image fade-in effect - 簡化為淡入效果 */
+@keyframes fadeIn {
   0% {
-    transform: translateY(30px); /* 减少初始位移距离，从100px减到30px */
     opacity: 0;
   }
   100% {
-    transform: translateY(0);
     opacity: 1;
   }
 }
@@ -267,20 +265,29 @@ body.dark .tag:hover {
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
   cursor: pointer;
-  opacity: 0;
-  transform: translateY(30px);
+
+  /* 使用 visibility 而非 opacity，避免影響 Masonry 佈局計算 */
+  visibility: hidden; /* 初始隱藏，不影響佈局計算 */
+  opacity: 1; /* 保持透明度為1，讓 Masonry 正確計算 */
   z-index: 1;
   margin-bottom: 8px; /* 對應 Masonry gutter */
+
+  /* 準備淡入動畫 */
+  transition: opacity 0.5s ease-out, visibility 0s;
 }
 
 /* 已加载图片的基本样式 */
 .gallery img.loaded {
-  animation: flyIn 0.5s ease-out forwards; /* 将动画时间从0.8s减少到0.5s使动画更快 */
-  transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1), 
+  /* 顯示圖片，使用淡入效果但不影響位置 */
+  visibility: visible;
+  opacity: 1;
+
+  /* 為懸停效果準備 transition */
+  transition: transform 0.3s cubic-bezier(0.19, 1, 0.22, 1),
               box-shadow 0.3s cubic-bezier(0.19, 1, 0.22, 1),
+              opacity 0.3s ease-out,
               z-index 0.1s;
   will-change: transform, box-shadow;
-  opacity: 1; /* 确保图片可见，不依赖动画 */
 }
 
 /* 悬停样式 - 使用更长的动画时间 */
