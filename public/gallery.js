@@ -121,11 +121,47 @@ class Gallery {
             this.imageLoader.filterImages('all');
         }
 
-        // Hide loading spinner after initial setup
+        // Hide loading spinner after initial setup and ensure all images are loaded
         setTimeout(() => {
             this.hideLoading();
-            this.imageLoader.checkIfMoreImagesNeeded();
+            this.ensureAllImagesLoaded();
         }, 500);
+    }
+
+    // 確保所有圖片都被載入
+    async ensureAllImagesLoaded() {
+        const totalImages = this.dataLoader.getTotalImages();
+        console.log(`🔍 檢查圖片載入狀態: 目標 ${totalImages} 張圖片`);
+
+        let attempts = 0;
+        const maxAttempts = 10;
+
+        const checkAndLoadMore = () => {
+            const loadedCount = this.imageLoader.imagesLoadedCount;
+            console.log(`📊 已載入 ${loadedCount}/${totalImages} 張圖片 (嘗試 ${attempts + 1}/${maxAttempts})`);
+
+            if (loadedCount >= totalImages) {
+                console.log('✅ 所有圖片載入完成');
+                return;
+            }
+
+            if (attempts >= maxAttempts) {
+                console.warn(`⚠️ 達到最大嘗試次數，已載入 ${loadedCount}/${totalImages} 張圖片`);
+                return;
+            }
+
+            attempts++;
+
+            // 強制觸發載入更多圖片
+            console.log(`🔄 強制載入剩餘圖片 (第 ${attempts} 次嘗試)`);
+            this.imageLoader.loadNextImages(this.tagFilter.getCurrentTag());
+
+            // 2秒後再次檢查
+            setTimeout(checkAndLoadMore, 2000);
+        };
+
+        // 開始檢查和載入
+        setTimeout(checkAndLoadMore, 1000);
     }
 
     // Hide the loading spinner and show gallery

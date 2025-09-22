@@ -4,7 +4,6 @@ class ImageLoader {
         this.galleryElement = galleryElement;
         this.dataLoader = dataLoader;
         this.imagesPerLoad = 10;
-        this.currentIndex = 0;
         this.imagesLoadedCount = 0;
         this.currentTag = 'all';
         this.isScrollLoading = false;
@@ -173,42 +172,95 @@ class ImageLoader {
         const viewportHeight = window.innerHeight;
         const scrollPosition = window.scrollY + viewportHeight;
         const documentHeight = document.documentElement.scrollHeight;
+        const totalImages = this.dataLoader.getAllImages().length;
+        const remainingImages = totalImages - this.imagesLoadedCount;
 
-        // 當接近底部時載入更多圖片
-        if (scrollPosition >= documentHeight - viewportHeight * 0.5) {
+        console.log(`🔍 滾動檢查:`, {
+            viewportHeight,
+            scrollPosition,
+            documentHeight,
+            已載入圖片: this.imagesLoadedCount,
+            總圖片數: totalImages,
+            剩餘圖片: remainingImages,
+            觸發條件: scrollPosition >= documentHeight - viewportHeight * 0.5
+        });
+
+        // 如果還有圖片未載入，且滿足以下任一條件就觸發載入：
+        // 1. 接近底部 (原始邏輯)
+        // 2. 已載入圖片數少於總數的 80%
+        // 3. 文檔高度較小時 (內容不夠長無法觸發滾動)
+        const shouldLoadMore = remainingImages > 0 && (
+            scrollPosition >= documentHeight - viewportHeight * 0.5 ||
+            this.imagesLoadedCount < totalImages * 0.8 ||
+            documentHeight < viewportHeight * 2
+        );
+
+        if (shouldLoadMore) {
+            console.log(`🚀 觸發載入更多圖片: 剩餘 ${remainingImages} 張`);
             this.loadNextImages(this.currentTag);
+        } else if (remainingImages === 0) {
+            console.log('✅ 所有圖片已載入完成');
         }
     }
 
     loadNextImages(tag = 'all') {
-        if (this.isScrollLoading) return;
+        if (this.isScrollLoading) {
+            console.log('⏳ 圖片載入中，跳過重複請求');
+            return;
+        }
 
-        const imagesToLoad = this.getCurrentImages().filter(img => {
+        const allAvailableImages = this.getCurrentImages().filter(img => {
             return (tag === 'all' || img.category === tag) &&
                    !this.loadedImageUrls.has(img.preview);
-        }).slice(this.currentIndex, this.currentIndex + this.imagesPerLoad);
+        });
+
+        // 修復：從可用圖片數組的開頭取出需要的數量，而不是使用 currentIndex
+        const imagesToLoad = allAvailableImages.slice(0, this.imagesPerLoad);
+
+        console.log(`🔍 載入狀態檢查:`, {
+            總圖片數: this.getCurrentImages().length,
+            當前標籤: tag,
+            已載入: this.imagesLoadedCount,
+            可載入圖片數: allAvailableImages.length,
+            本批次載入: imagesToLoad.length,
+            每批次大小: this.imagesPerLoad
+        });
 
         if (imagesToLoad.length === 0) {
-            console.log('沒有更多圖片可載入');
+            console.log('✅ 沒有更多圖片可載入');
+            this.isScrollLoading = false; // 確保標記被重置
             return;
         }
 
         this.isScrollLoading = true;
-        console.log(`載入 ${imagesToLoad.length} 張圖片 (Masonry版本)`);
+        console.log(`🚀 開始載入 ${imagesToLoad.length} 張圖片 (Masonry版本)`);
 
         const loadSingleImage = (index) => {
             if (index >= imagesToLoad.length) {
                 this.isScrollLoading = false;
-                console.log('本批次圖片載入完成 (Masonry)');
+                console.log(`✅ 本批次圖片載入完成 (Masonry) - 總計已載入 ${this.imagesLoadedCount} 張`);
                 return;
             }
 
             const imageData = imagesToLoad[index];
+            console.log(`📷 載入圖片 ${index + 1}/${imagesToLoad.length}: ${imageData.name}`);
 
             // 先預加載圖片，不立即添加到 DOM
             const preloadImg = new Image();
 
+            // 設置超時機制防止卡住
+            const loadTimeout = setTimeout(() => {
+                console.warn(`⏰ 圖片載入超時: ${imageData.preview}`);
+                preloadImg.onload = null;
+                preloadImg.onerror = null;
+                // 跳過該圖片，繼續載入下一張
+                loadSingleImage(index + 1);
+            }, 10000); // 10秒超時
+
             preloadImg.onload = () => {
+                clearTimeout(loadTimeout);
+                console.log(`✅ 圖片預載入成功: ${imageData.name}`);
+
                 // 圖片預加載完成後，創建 DOM 元素
                 const img = document.createElement('img');
 
@@ -252,14 +304,16 @@ class ImageLoader {
                     this.refreshLightGallery();
 
                     // 載入下一張圖片
-                    this.currentIndex++;
                     this.imagesLoadedCount++;
+                    console.log(`📊 進度更新: ${this.imagesLoadedCount} 張已載入`);
                     loadSingleImage(index + 1);
                 });
             };
 
             preloadImg.onerror = () => {
-                console.error('圖片載入失敗:', imageData.preview);
+                clearTimeout(loadTimeout);
+                console.error(`❌ 圖片載入失敗: ${imageData.preview}`);
+                // 即使載入失敗也要繼續下一張
                 loadSingleImage(index + 1);
             };
 
@@ -273,7 +327,6 @@ class ImageLoader {
     filterImages(tag) {
         console.log(`篩選圖片: ${tag} (Masonry 100% 自動佈局)`);
         this.currentTag = tag;
-        this.currentIndex = 0;
         this.imagesLoadedCount = 0;
         this.loadedImageUrls.clear();
 
