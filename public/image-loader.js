@@ -30,12 +30,14 @@ class ImageLoader {
         gridSizer.className = 'grid-sizer';
         this.galleryElement.appendChild(gridSizer);
 
-        // 初始化 Masonry
+        // 初始化 Masonry - 2025 最佳實踐配置
         this.masonry = new Masonry(this.galleryElement, {
             itemSelector: 'img',
             columnWidth: '.grid-sizer',
             percentPosition: true,
-            gutter: 8 // 0.8em converted to pixels approximately
+            gutter: 8,
+            fitWidth: true,  // 容器自動適應寬度
+            initLayout: false  // 手動控制初始化時機
         });
 
         console.log('Masonry 初始化完成');
@@ -149,7 +151,9 @@ class ImageLoader {
                 clearTimeout(resizeTimeout);
             }
             resizeTimeout = setTimeout(() => {
+                // 只更新性能參數，讓 Masonry 自動處理佈局
                 this.updateImagesPerLoad();
+                // Masonry 會自動響應 CSS 媒體查詢變化
                 if (this.masonry) {
                     this.masonry.layout();
                 }
@@ -158,17 +162,18 @@ class ImageLoader {
     }
 
     updateImagesPerLoad() {
+        // 僅根據螢幕寬度調整加載性能，讓 Masonry 自動決定佈局
         const width = window.innerWidth;
         if (width < 600) {
-            this.imagesPerLoad = 8;
+            this.imagesPerLoad = 8;   // 移動設備：較少加載
         } else if (width < 900) {
-            this.imagesPerLoad = 12;
+            this.imagesPerLoad = 12;  // 平板：中等加載
         } else if (width < 1200) {
-            this.imagesPerLoad = 16;
+            this.imagesPerLoad = 16;  // 小桌面：較多加載
         } else if (width < 1500) {
-            this.imagesPerLoad = 20;
+            this.imagesPerLoad = 20;  // 大桌面：更多加載
         } else {
-            this.imagesPerLoad = 24;
+            this.imagesPerLoad = 24;  // 超大螢幕：最多加載
         }
     }
 
@@ -313,17 +318,13 @@ class ImageLoader {
     }
 
     setGalleryMarginTop() {
-        // 與原版本保持一致
+        // 簡化版本 - 只考慮 header 高度
         const header = document.querySelector('header');
-        const tagFilter = document.querySelector('.tag-filter-vertical');
-
         let totalHeight = 0;
-        if (header) totalHeight += header.offsetHeight;
-        if (tagFilter && window.getComputedStyle(tagFilter).display !== 'none') {
-            totalHeight += tagFilter.offsetHeight;
-        }
 
+        if (header) totalHeight += header.offsetHeight;
         totalHeight += 40; // 額外間距
+
         this.galleryElement.style.marginTop = `${totalHeight}px`;
     }
 }
